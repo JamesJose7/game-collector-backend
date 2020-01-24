@@ -1,4 +1,6 @@
-const { db } = require('../util/admin');
+const { admin, db } = require('../util/admin');
+
+const config = require('../util/config');
 
 const { reducePlatformDetails } = require('../util/validators');
 
@@ -80,5 +82,79 @@ exports.editPlatform = (req, res) => {
         .catch(err => {
             console.error(err);
             return res.status(500).json({ error: err.code });
+        });
+};
+
+// Upload platform cover
+exports.uploadPlatformCover = (req, res) => {
+    db.doc(`/platforms/${req.params.platformId}`)
+        .get()
+        .then(doc => {
+            if (!doc.exists)
+                return res
+                    .status(404)
+                    .json({ error: 'Platform does not exist' });
+            else {
+                const BusBoy = require('busboy');
+                const path = require('path');
+                const os = require('os');
+                const fs = require('fs');
+
+                const busboy = new BusBoy({ headers: req.headers });
+
+                let imageFileName;
+                let imageToBeUploaded = {};
+
+                busboy.on(
+                    'file',
+                    (fieldname, file, filename, encoding, mimetype) => {
+                        if (
+                            mimetype !== 'image/jpeg' &&
+                            mimetype !== 'image/png'
+                        )
+                            return res
+                                .status(400)
+                                .json({ error: 'Wrong file type submitted' });
+                        // TODO: Transform jpegs into pngs
+                        const imageExtension = filename.split('.')[
+                            filename.split('.').length - 1
+                        ];
+                        imageFileName = `${req.params.platformId}.png`;
+                        const filepath = path.join(os.tmpdir(), imageFileName);
+                        imageToBeUploaded = { filepath, mimetype };
+                        file.pipe(fs.createWriteStream(filepath));
+                    }
+                );
+                busboy.on('finish', () => {
+                    admin
+                        .storage()
+                        .bucket(`${config.storageBucket}`)
+                        .upload(imageToBeUploaded.filepath, {
+                            resumable: false,
+                            metadata: {
+                                metadata: {
+                                    contentType: imageToBeUploaded.mimetype
+                                }
+                            }
+                        })
+                        .then(() => {
+                            const imageUri = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${imageFileName}?alt=media`;
+                            return db
+                                .doc(`/platforms/${req.params.platformId}`)
+                                .update({ imageUri });
+                        })
+                        .then(() => {
+                            return res.json({
+                                uploaded: true,
+                                message: 'Image uploaded successfully'
+                            });
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            return res.status(500).json({ error: err.code });
+                        });
+                });
+                busboy.end(req.rawBody);
+            }
         });
 };

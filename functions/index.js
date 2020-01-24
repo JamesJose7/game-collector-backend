@@ -8,6 +8,7 @@ const { signup, login } = require('./handlers/users');
 
 const {
     postOneGame,
+    uploadGameCover,
     editGame,
     getGame,
     getGamesByUserAndPlatform
@@ -19,6 +20,7 @@ const {
 } = require('./handlers/publishers');
 const {
     postOnePlatform,
+    uploadPlatformCover,
     editPlatform,
     getOnePlatform,
     getPlatformsByUser
@@ -31,12 +33,14 @@ app.post('/login', login);
 // Game routes
 app.post('/games', FBAuth, postOneGame);
 app.post('/games/:gameId', FBAuth, editGame);
+app.post('/games/:gameId/image', FBAuth, uploadGameCover);
 app.get('/games/:gameId', FBAuth, getGame);
 app.get('/games/:username/:platformId', FBAuth, getGamesByUserAndPlatform);
 
 // Platforms routes
 app.post('/platforms', FBAuth, postOnePlatform);
 app.post('/platforms/:platformId', FBAuth, editPlatform);
+app.post('/platforms/:platformId/image', FBAuth, uploadPlatformCover);
 app.get('/platforms/:platformId', FBAuth, getOnePlatform);
 app.get('/platforms', FBAuth, getPlatformsByUser);
 
