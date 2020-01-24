@@ -38,5 +38,26 @@ exports.validateLoginData = data => {
     return {
         errors,
         valid: Object.keys(errors).length === 0 ? true : false
-    }
-}
+    };
+};
+
+exports.reduceGameDetails = data => {
+    let game = {};
+
+    if (data.imageUri != undefined)
+        if (!isEmpty(data.imageUri.trim())) game.imageUri = data.imageUri;
+    if (data.isPhysical !== undefined) game.isPhysical = data.isPhysical;
+    if (data.name != undefined)
+        if (!isEmpty(data.name.trim())) game.name = data.name;
+    if (data.shortName != undefined)
+        if (!isEmpty(data.shortName.trim())) game.shortName = data.shortName;
+    if (data.publisherId != undefined)
+        if (!isEmpty(data.publisherId.trim()))
+            game.publisherId = data.publisherId;
+    if (data.publisher != undefined)
+        if (!isEmpty(data.publisher.trim())) game.publisher = data.publisher;
+    if (data.timesCompleted !== undefined)
+        game.timesCompleted = data.timesCompleted;
+
+    return game;
+};
