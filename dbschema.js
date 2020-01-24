@@ -25,6 +25,7 @@ let db = {
     platforms: [
         {
             platformId: 'odsfnsoidnfos',
+            user: 'username',
             name: 'Nintendo Switch',
             imageUri: 'http://url.png',
             color: '#ff000a'

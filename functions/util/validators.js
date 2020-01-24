@@ -61,3 +61,17 @@ exports.reduceGameDetails = data => {
 
     return game;
 };
+
+exports.reducePlatformDetails = data => {
+    let platform = {};
+
+    if (data.imageUri != undefined)
+        if (!isEmpty(data.imageUri.trim())) platform.imageUri = data.imageUri;
+    if (data.name != undefined)
+        if (!isEmpty(data.name.trim())) platform.name = data.name;
+    if (data.color != undefined)
+        if (!isEmpty(data.color.trim())) platform.color = data.color;
+
+    return platform;
+};
+
