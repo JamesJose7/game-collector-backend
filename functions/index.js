@@ -4,7 +4,7 @@ const FBAuth = require('./util/fbAuth');
 
 const { db } = require('./util/admin');
 
-const { signup, login } = require('./handlers/users');
+const { signup, login, getAuthenticatedUser } = require('./handlers/users');
 
 const {
     postOneGame,
@@ -29,6 +29,7 @@ const {
 // User routes
 app.post('/signup', signup);
 app.post('/login', login);
+app.get('/user', FBAuth, getAuthenticatedUser);
 
 // Game routes
 app.post('/games', FBAuth, postOneGame);

@@ -94,3 +94,20 @@ exports.login = (request, response) => {
                 .json({ general: 'Wrong credentials, please try again' });
         });
 };
+
+// Get authenticated user details
+exports.getAuthenticatedUser = (request, response) => {
+    let userData = {};
+    db.doc(`/users/${request.user.username}`)
+        .get()
+        .then(doc => {
+            if (doc.exists) {
+                userData.credentials = doc.data();
+                return response.json(userData);
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            return response.status(500).json({ error: err.code });
+        });
+};
