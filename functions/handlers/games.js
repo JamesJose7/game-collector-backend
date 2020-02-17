@@ -4,7 +4,24 @@ const config = require('../util/config');
 
 const { reduceGameDetails } = require('../util/validators');
 
+const axios = require('axios').default;
+const { apiKey } = require('../util/igdb');
+
 // Post a game from user
+const saveGame = (newGame, res) => {
+    db.collection('games')
+        .add(newGame)
+        .then(doc => {
+            const responseGame = newGame;
+            responseGame.gameId = doc.id;
+            res.json(responseGame);
+        })
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({ error: 'Something went wrong' });
+        });
+};
+
 exports.postOneGame = (req, res) => {
     // TODO: Remove date check, it's only for bulk migration of previous data
     let date;
@@ -24,18 +41,76 @@ exports.postOneGame = (req, res) => {
         publisher: req.body.publisher,
         timesCompleted: req.body.timesCompleted
     };
+    
+    saveGame(newGame, res);
 
-    db.collection('games')
-        .add(newGame)
-        .then(doc => {
-            const responseGame = newGame;
-            responseGame.gameId = doc.id;
-            res.json(responseGame);
-        })
-        .catch(err => {
-            console.error(err);
-            res.status(500).json({ error: 'Something went wrong' });
-        });
+    // TODO: Implement when changing from the free firebase plan
+    // get artwork if user did not select one
+    // if (newGame.imageUri === undefined || newGame.imageUri.trim() == '') {
+    //     // Query for game based on name
+    //     axios({
+    //         method: 'post',
+    //         url: 'https://api-v3.igdb.com/games',
+    //         headers: {
+    //             'user-key': apiKey,
+    //             'Content-Type': 'text/plain'
+    //         },
+    //         data: `search "${newGame.name}"; fields name,first_release_date, cover, category; where first_release_date != null; limit 15;`
+    //     })
+    //         .then(response => {
+    //             // Filter out DLC
+    //             let resultGames = response.data.filter(
+    //                 game => game.category !== 1
+    //             );
+    //             if (resultGames.length > 0) {
+    //                 let selectedGame = resultGames[0];
+    //                 if (selectedGame.cover !== undefined) {
+    //                     // Get game cover URL
+    //                     axios({
+    //                         method: 'post',
+    //                         url: 'https://api-v3.igdb.com/covers',
+    //                         headers: {
+    //                             'user-key': apiKey,
+    //                             'Content-Type': 'text/plain'
+    //                         },
+    //                         data: `fields game,height,image_id,url,width; where id = ${selectedGame.cover};`
+    //                     })
+    //                         .then(response => {
+    //                             // Set image cover
+    //                             let covers = response.data;
+    //                             if (covers.length > 0) {
+    //                                 // transform URL
+    //                                 let imageUrl = covers[0].url;
+    //                                 imageUrl = imageUrl.replace(
+    //                                     '//',
+    //                                     'https://'
+    //                                 );
+    //                                 imageUrl = imageUrl.replace(
+    //                                     't_thumb',
+    //                                     't_cover_big'
+    //                                 );
+    //                                 newGame.imageUri = imageUrl;
+    //                             }
+    //                             saveGame(newGame, res);
+    //                         })
+    //                         .catch(err => {
+    //                             console.error(err);
+    //                             saveGame(newGame, res);
+    //                         });
+    //                 } else {
+    //                     saveGame(newGame, res);
+    //                 }
+    //             } else {
+    //                 saveGame(newGame, res);
+    //             }
+    //         })
+    //         .catch(err => {
+    //             console.error(err);
+    //             saveGame(newGame, res);
+    //         });
+    // } else {
+    //     saveGame(newGame, res);
+    // }
 };
 
 // Edit game
