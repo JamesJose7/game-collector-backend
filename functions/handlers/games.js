@@ -41,7 +41,7 @@ exports.postOneGame = (req, res) => {
         publisher: req.body.publisher,
         timesCompleted: req.body.timesCompleted
     };
-    
+
     saveGame(newGame, res);
 
     // TODO: Implement when changing from the free firebase plan
@@ -251,5 +251,30 @@ exports.uploadGameCover = (req, res) => {
                 });
                 busboy.end(req.rawBody);
             }
+        });
+};
+
+// Delete game
+exports.deleteGame = (req, res) => {
+    db.doc(`/games/${req.params.gameId}`)
+        .delete()
+        .then(() => {
+            // Delete image
+            admin
+                .storage()
+                .bucket(`${config.storageBucket}`)
+                .file(`${req.params.gameId}.png`)
+                .delete()
+                .then(() => {
+                    res.json({ message: 'Game deleted successfully' });
+                })
+                .catch(err => {
+                    // There was never a cover stored for this game
+                    res.json({ message: 'Game deleted successfully' });
+                });
+        })
+        .catch(err => {
+            console.error(err);
+            return res.status(500).json({ error: err.code });
         });
 };
