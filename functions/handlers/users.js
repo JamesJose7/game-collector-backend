@@ -67,6 +67,42 @@ exports.signup = (request, response) => {
         });
 };
 
+// Sign up new user info when using SDKs signup
+exports.signupUserdetails = (request, response) => {
+    const newUser = {
+        userId: request.body.userId,
+        email: request.body.email,
+        username: request.body.username
+    };
+
+    db.doc(`/users/${newUser.username}`)
+        .get()
+        .then(doc => {
+            if (doc.exists) {
+                return response
+                    .status(400)
+                    .json({ username: 'User initial setup already finished' });
+            } else {
+                const userCredentials = {
+                    username: newUser.username,
+                    email: newUser.email,
+                    createdAt: new Date().toISOString(),
+                    userId: newUser.userId
+                };
+                return db.doc(`/users/${newUser.username}`).set(userCredentials);
+            }
+        })
+        .then(doc => {
+            return response.status(201).json({ message: 'Successfully added user details' });
+        })
+        .catch(err => {
+            console.error(err);
+            return response
+                .status(500)
+                .json({ general: 'Something went wrong, please try again' });
+        });
+};
+
 // Log in
 exports.login = (request, response) => {
     const user = {
