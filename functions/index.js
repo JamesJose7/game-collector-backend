@@ -31,6 +31,9 @@ const {
     getOnePlatform,
     getPlatformsByUser
 } = require('./handlers/platforms');
+const {
+    getUserStats
+} = require('./handlers/stats');
 
 // User routes
 app.post('/signup', signup);
@@ -57,6 +60,9 @@ app.get('/platforms', FBAuth, getPlatformsByUser);
 app.post('/publishers', FBAuth, postOnePublisher);
 app.get('/publishers/:publisherId', FBAuth, getOnePublisher);
 app.get('/publishers', FBAuth, getPublishers);
+
+// Stats routes
+app.get('/stats', FBAuth, getUserStats);
 
 // Export express routes
 exports.api = functions.https.onRequest(app);
