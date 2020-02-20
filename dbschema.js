@@ -37,6 +37,26 @@ let db = {
             name: 'Nintendo'
         }
     ],
+    stats: [
+        {
+            user: 'username',
+            userId: 'joi234ji235h2o3h5',
+            physicalTotal: 60,
+            digitalTotal: 100,
+            completedGamesTotal: 0,
+            lastGameCompleted: 'The legend of zelda breath of the wild',
+            platforms: [
+                {
+                    platformId: 'osidfosidfoi2',
+                    platformName: 'Nintendo Switch',
+                    physicalTotal: 34,
+                    digitalTotal: 22,
+                    completedGamesTotal: 40,
+                    lastGameCompleted: 'The legend of zelda breath of the wild'
+                }
+            ]
+        }
+    ],
     credits: [
         '<div>Icons made by <a href="https://www.flaticon.com/authors/mynamepong" title="mynamepong">mynamepong</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>'
     ]
