@@ -63,3 +63,6 @@ node_modules/
 
 # dotenv environment variables file
 .env
+
+functions/db_migration/prev_db.json
+functions/db_migration/temp.json
