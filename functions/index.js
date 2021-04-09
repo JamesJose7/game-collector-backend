@@ -8,7 +8,7 @@ const {
     signup,
     login,
     getAuthenticatedUser,
-    signupUserdetails
+    signupUserdetails,
 } = require('./handlers/users');
 
 const {
@@ -23,18 +23,17 @@ const {
 const {
     postOnePublisher,
     getOnePublisher,
-    getPublishers
+    getPublishers,
 } = require('./handlers/publishers');
 const {
     postOnePlatform,
     uploadPlatformCover,
     editPlatform,
     getOnePlatform,
-    getPlatformsByUser
+    getPlatformsByUser,
 } = require('./handlers/platforms');
-const {
-    getUserStats
-} = require('./handlers/stats');
+const { getUserStats } = require('./handlers/stats');
+const { twitchAuth } = require('./handlers/igdb');
 
 // User routes
 app.post('/signup', signup);
@@ -66,6 +65,9 @@ app.get('/publishers', FBAuth, getPublishers);
 // Stats routes
 app.get('/stats', FBAuth, getUserStats);
 
+// IGDB routes
+app.get('/igdbAuth', twitchAuth);
+
 // Export express routes
 exports.api = functions.https.onRequest(app);
 
@@ -74,7 +76,7 @@ exports.api = functions.https.onRequest(app);
 // Create stats document on user create
 exports.createStatsOnNewUser = functions.firestore
     .document('users/{id}')
-    .onCreate(snapshot => {
+    .onCreate((snapshot) => {
         const data = snapshot.data();
         const stats = {
             user: data.username,
@@ -83,16 +85,16 @@ exports.createStatsOnNewUser = functions.firestore
             digitalTotal: 0,
             completedGamesTotal: 0,
             lastGameCompleted: '',
-            platforms: []
+            platforms: [],
         };
 
         return db
             .collection('stats')
             .add(stats)
-            .then(doc => {
+            .then((doc) => {
                 console.info('Successfully added stats for user: ' + doc.user);
             })
-            .catch(err => {
+            .catch((err) => {
                 console.error(err);
             });
     });
@@ -100,7 +102,7 @@ exports.createStatsOnNewUser = functions.firestore
 // Create platform stats object on new platform
 exports.createPlatformStatsOnNewPlatform = functions.firestore
     .document('platforms/{id}')
-    .onCreate(snapshot => {
+    .onCreate((snapshot) => {
         const platform = snapshot.data();
         // Get stats for current user
         return db
@@ -108,8 +110,8 @@ exports.createPlatformStatsOnNewPlatform = functions.firestore
             .where('user', '==', platform.user)
             .limit(1)
             .get()
-            .then(data => {
-                data.forEach(stats => {
+            .then((data) => {
+                data.forEach((stats) => {
                     // Add new stats about platform
                     const newPlatformStats = {
                         platformId: snapshot.id,
@@ -117,7 +119,7 @@ exports.createPlatformStatsOnNewPlatform = functions.firestore
                         physicalTotal: 0,
                         digitalTotal: 0,
                         completedGamesTotal: 0,
-                        lastGameCompleted: ''
+                        lastGameCompleted: '',
                     };
                     const previousStats = stats.data();
                     previousStats.platforms.push(newPlatformStats);
@@ -128,19 +130,18 @@ exports.createPlatformStatsOnNewPlatform = functions.firestore
                         .then(() =>
                             console.info('Platform stats created successfully')
                         )
-                        .catch(err => console.error(err));
+                        .catch((err) => console.error(err));
                 });
             })
-            .catch(err => {
+            .catch((err) => {
                 console.error(err);
             });
     });
 
-
 // Update stats on game creation
 exports.updateStatsOnGameCreation = functions.firestore
     .document('games/{id}')
-    .onCreate(snapshot => {
+    .onCreate((snapshot) => {
         const game = snapshot.data();
         // Get stats for current user
         return db
@@ -148,10 +149,12 @@ exports.updateStatsOnGameCreation = functions.firestore
             .where('user', '==', game.user)
             .limit(1)
             .get()
-            .then(data => {
-                data.forEach(doc => {
+            .then((data) => {
+                data.forEach((doc) => {
                     let stats = doc.data();
-                    let platformStats = stats.platforms.filter(platform => platform.platformId === game.platformId)[0]
+                    let platformStats = stats.platforms.filter(
+                        (platform) => platform.platformId === game.platformId
+                    )[0];
                     // Update stats
                     if (game.isPhysical) {
                         stats.physicalTotal++;
@@ -164,26 +167,24 @@ exports.updateStatsOnGameCreation = functions.firestore
                     if (game.timesCompleted > 0) {
                         stats.completedGamesTotal++;
                         platformStats.completedGamesTotal++;
-                        stats.lastGameCompleted = game.name; 
+                        stats.lastGameCompleted = game.name;
                         platformStats.lastGameCompleted = game.name;
                     }
                     // Update stats object
-                    stats.platforms = stats.platforms.map(platform => {
+                    stats.platforms = stats.platforms.map((platform) => {
                         if (platform.platformId === platformStats.platformId)
                             return platformStats;
                         else return platform;
-                    })
+                    });
 
                     db.collection('stats')
                         .doc(doc.id)
                         .set(stats)
-                        .then(() =>
-                            console.info('Stats updated successfully')
-                        )
-                        .catch(err => console.error(err));
+                        .then(() => console.info('Stats updated successfully'))
+                        .catch((err) => console.error(err));
                 });
             })
-            .catch(err => {
+            .catch((err) => {
                 console.error(err);
             });
     });
@@ -191,7 +192,7 @@ exports.updateStatsOnGameCreation = functions.firestore
 // Update stats on game update
 exports.updateStatsOnGameUpdate = functions.firestore
     .document('games/{id}')
-    .onUpdate(change => {
+    .onUpdate((change) => {
         const before = change.before.data();
         const after = change.after.data();
 
@@ -201,18 +202,22 @@ exports.updateStatsOnGameUpdate = functions.firestore
             .where('user', '==', after.user)
             .limit(1)
             .get()
-            .then(data => {
-                data.forEach(doc => {
+            .then((data) => {
+                data.forEach((doc) => {
                     let stats = doc.data();
-                    let platformStats = stats.platforms.filter(platform => platform.platformId === after.platformId)[0]
+                    let platformStats = stats.platforms.filter(
+                        (platform) => platform.platformId === after.platformId
+                    )[0];
                     // Did user changed isPhysical?
                     if (before.isPhysical != after.isPhysical) {
-                        if (before.isPhysical) { // Changed to digital
+                        if (before.isPhysical) {
+                            // Changed to digital
                             stats.physicalTotal--;
                             platformStats.physicalTotal--;
                             stats.digitalTotal++;
                             platformStats.digitalTotal++;
-                        } else if (!before.isPhysical) { // Changed to physical
+                        } else if (!before.isPhysical) {
+                            // Changed to physical
                             stats.physicalTotal++;
                             platformStats.physicalTotal++;
                             stats.digitalTotal--;
@@ -221,36 +226,36 @@ exports.updateStatsOnGameUpdate = functions.firestore
                     }
                     // Did user update times completed?
                     if (before.timesCompleted !== after.timesCompleted) {
-                        if (after.timesCompleted === 0) { // Game was finished but he apparently changed his mind
+                        if (after.timesCompleted === 0) {
+                            // Game was finished but he apparently changed his mind
                             stats.completedGamesTotal--;
                             platformStats.completedGamesTotal--;
-                        } else if (after.timesCompleted > 0) { // Has now finished the game
+                        } else if (after.timesCompleted > 0) {
+                            // Has now finished the game
                             stats.completedGamesTotal++;
                             platformStats.completedGamesTotal++;
-                            stats.lastGameCompleted = after.name; 
+                            stats.lastGameCompleted = after.name;
                             platformStats.lastGameCompleted = after.name;
                         }
                     }
                     // Update stats object
-                    stats.platforms = stats.platforms.map(platform => {
+                    stats.platforms = stats.platforms.map((platform) => {
                         if (platform.platformId === platformStats.platformId)
                             return platformStats;
                         else return platform;
-                    })
+                    });
 
                     db.collection('stats')
                         .doc(doc.id)
                         .set(stats)
-                        .then(() =>
-                            console.info('Stats updated successfully')
-                        )
-                        .catch(err => console.error(err));
+                        .then(() => console.info('Stats updated successfully'))
+                        .catch((err) => console.error(err));
                 });
             })
-            .catch(err => {
+            .catch((err) => {
                 console.error(err);
             });
-    })
+    });
 
 // Update stats on game deletion
 exports.updateStatsOnGameDelete = functions.firestore
@@ -263,10 +268,12 @@ exports.updateStatsOnGameDelete = functions.firestore
             .where('user', '==', game.user)
             .limit(1)
             .get()
-            .then(data => {
-                data.forEach(doc => {
+            .then((data) => {
+                data.forEach((doc) => {
                     let stats = doc.data();
-                    let platformStats = stats.platforms.filter(platform => platform.platformId === game.platformId)[0]
+                    let platformStats = stats.platforms.filter(
+                        (platform) => platform.platformId === game.platformId
+                    )[0];
                     // Update stats
                     if (game.isPhysical) {
                         stats.physicalTotal--;
@@ -281,22 +288,20 @@ exports.updateStatsOnGameDelete = functions.firestore
                         platformStats.completedGamesTotal--;
                     }
                     // Update stats object
-                    stats.platforms = stats.platforms.map(platform => {
+                    stats.platforms = stats.platforms.map((platform) => {
                         if (platform.platformId === platformStats.platformId)
                             return platformStats;
                         else return platform;
-                    })
+                    });
 
                     db.collection('stats')
                         .doc(doc.id)
                         .set(stats)
-                        .then(() =>
-                            console.info('Stats updated successfully')
-                        )
-                        .catch(err => console.error(err));
+                        .then(() => console.info('Stats updated successfully'))
+                        .catch((err) => console.error(err));
                 });
             })
-            .catch(err => {
+            .catch((err) => {
                 console.error(err);
             });
     });
