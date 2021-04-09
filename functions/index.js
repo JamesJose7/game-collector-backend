@@ -18,6 +18,7 @@ const {
     editGame,
     getGame,
     getGamesByUserAndPlatform,
+    toggleGameCompletion
 } = require('./handlers/games');
 const {
     postOnePublisher,
@@ -45,6 +46,7 @@ app.post('/games', FBAuth, postOneGame);
 app.post('/games/:gameId', FBAuth, editGame);
 app.post('/games/:gameId/image', FBAuth, uploadGameCover);
 app.post('/games/:gameId/delete', FBAuth, deleteGame);
+app.post('/games/toggleCompletion/:gameId', FBAuth, toggleGameCompletion);
 app.get('/games/:gameId', FBAuth, getGame);
 app.get('/games/:username/:platformId', FBAuth, getGamesByUserAndPlatform);
 
