@@ -278,3 +278,34 @@ exports.deleteGame = (req, res) => {
             return res.status(500).json({ error: err.code });
         });
 };
+
+// Toggle game completion
+exports.toggleGameCompletion = (req, res) => {
+    db.doc(`/games/${req.params.gameId}`)
+        .get()
+        .then((doc) => {
+            // Get previous completion
+            let { timesCompleted } = doc.data();
+            if (timesCompleted == 0)
+                timesCompleted = 1;
+            else if (timesCompleted > 0)
+                timesCompleted = 0;
+            // Update times completed
+            db.doc(`/games/${req.params.gameId}`)
+                .update({ timesCompleted })
+                .then(() => {
+                    // Response status
+                    return res.json({ 
+                        completed: timesCompleted > 0
+                     });
+                })
+                .catch(err => {
+                    console.error(err);
+                    return res.status(500).json({ error: err.code });
+                });
+        })
+        .catch(err => {
+            console.error(err);
+            return res.status(500).json({ error: err.code });
+        });
+};
