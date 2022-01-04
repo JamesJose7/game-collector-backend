@@ -34,6 +34,7 @@ const {
 } = require('./handlers/platforms');
 const { getUserStats } = require('./handlers/stats');
 const { twitchAuth } = require('./handlers/igdb');
+const { getGameHours } = require('./handlers/howlongtobeat');
 
 // User routes
 app.post('/signup', signup);
@@ -67,6 +68,9 @@ app.get('/stats', FBAuth, getUserStats);
 
 // IGDB routes
 app.get('/igdbAuth', twitchAuth);
+
+// Howlongtobeat routes
+app.get('/getGameHours', getGameHours)
 
 // Export express routes
 exports.api = functions.https.onRequest(app);
