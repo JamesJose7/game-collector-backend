@@ -1,0 +1,55 @@
+diff --git a/node_modules/howlongtobeat/dist/main/howlongtobeat.js b/node_modules/howlongtobeat/dist/main/howlongtobeat.js
+index 51954be..5949b5b 100644
+--- a/node_modules/howlongtobeat/dist/main/howlongtobeat.js
++++ b/node_modules/howlongtobeat/dist/main/howlongtobeat.js
+@@ -36,8 +36,8 @@ class HowLongToBeatService {
+     }
+ }
+ HowLongToBeatService.BASE_URL = 'https://howlongtobeat.com/';
+-HowLongToBeatService.DETAIL_URL = `${HowLongToBeatService.BASE_URL}game.php?id=`;
+-HowLongToBeatService.SEARCH_URL = `${HowLongToBeatService.BASE_URL}search_results.php`;
++HowLongToBeatService.DETAIL_URL = `${HowLongToBeatService.BASE_URL}game?id=`;
++HowLongToBeatService.SEARCH_URL = `${HowLongToBeatService.BASE_URL}search_results`;
+ exports.HowLongToBeatService = HowLongToBeatService;
+ /**
+  * Encapsulates a game detail
+diff --git a/node_modules/howlongtobeat/dist/main/htmlscraper.js b/node_modules/howlongtobeat/dist/main/htmlscraper.js
+index f7e8c2c..d064ab3 100644
+--- a/node_modules/howlongtobeat/dist/main/htmlscraper.js
++++ b/node_modules/howlongtobeat/dist/main/htmlscraper.js
+@@ -20,7 +20,8 @@ class HtmlScraper {
+                 let result = yield axios.get(url, {
+                     followRedirect: false,
+                     headers: {
+-                        'User-Agent': new UserAgent().toString()
++                        'User-Agent': new UserAgent().toString(),
++                        'referer': 'https://howlongtobeat.com/'
+                     },
+                     timeout: 20000,
+                 }).catch(e => { throw e; });
+@@ -58,7 +59,9 @@ class HtmlScraper {
+                     },
+                     headers: {
+                         'Content-type': 'application/x-www-form-urlencoded',
+-                        'User-Agent': new UserAgent().toString()
++                        'User-Agent': new UserAgent().toString(),
++                        'origin': 'https://howlongtobeat.com',
++                        'referer': 'https://howlongtobeat.com/'
+                     },
+                     timeout: 20000,
+                 });
+diff --git a/node_modules/howlongtobeat/src/main/howlongtobeat.ts b/node_modules/howlongtobeat/src/main/howlongtobeat.ts
+index 2c84af3..6c82cff 100644
+--- a/node_modules/howlongtobeat/src/main/howlongtobeat.ts
++++ b/node_modules/howlongtobeat/src/main/howlongtobeat.ts
+@@ -6,8 +6,8 @@ import { HtmlScraper } from './htmlscraper';
+ export class HowLongToBeatService {
+   private scraper: HtmlScraper = new HtmlScraper();
+   public static BASE_URL: string = 'https://howlongtobeat.com/';
+-  public static DETAIL_URL: string = `${HowLongToBeatService.BASE_URL}game.php?id=`;
+-  public static SEARCH_URL: string = `${HowLongToBeatService.BASE_URL}search_results.php`;
++  public static DETAIL_URL: string = `${HowLongToBeatService.BASE_URL}game?id=`;
++  public static SEARCH_URL: string = `${HowLongToBeatService.BASE_URL}search_results`;
+ 
+   constructor() {}
+ 
