@@ -39,7 +39,19 @@ exports.postOneGame = (req, res) => {
         platform: req.body.platform,
         publisherId: req.body.publisherId,
         publisher: req.body.publisher,
-        timesCompleted: req.body.timesCompleted
+        timesCompleted: req.body.timesCompleted,
+        firstReleaseDate: req.body.firstReleaseDate,
+        ageRatings: req.body.ageRatings,
+        criticsRating: req.body.criticsRating,
+        criticsRatingCount: req.body.criticsRatingCount,
+        userRating: req.body.userRating,
+        userRatingCount: req.body.userRatingCount,
+        totalRating: req.body.totalRating,
+        totalRatingCount: req.body.totalRatingCount,
+        genres: req.body.genres,
+        storyline: req.body.storyline,
+        summary: req.body.summary,
+        url: req.body.url
     };
 
     saveGame(newGame, res);
