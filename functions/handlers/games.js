@@ -25,7 +25,8 @@ const saveGame = (newGame, res) => {
 exports.postOneGame = (req, res) => {
     // TODO: Remove date check, it's only for bulk migration of previous data
     let date;
-    if (req.body.dateAdded !== undefined) date = req.body.dateAdded;
+    let previousDate = req.body.dateAdded;
+    if (previousDate) date = req.body.dateAdded;
     else date = new Date().toISOString();
 
     const newGame = {

@@ -9,6 +9,11 @@ const isEmpty = string => {
     return false;
 };
 
+const isUndefinedOrEmpty = string => {
+    if (string == undefined || isEmpty(string)) return true;
+    return false;
+};
+
 exports.validateSignupData = data => {
     let errors = {};
 
@@ -44,20 +49,43 @@ exports.validateLoginData = data => {
 exports.reduceGameDetails = data => {
     let game = {};
 
-    if (data.imageUri != undefined)
-        if (!isEmpty(data.imageUri.trim())) game.imageUri = data.imageUri;
+    if (!isUndefinedOrEmpty(data.imageUri)) 
+        game.imageUri = data.imageUri;
     if (data.isPhysical !== undefined) game.isPhysical = data.isPhysical;
-    if (data.name != undefined)
-        if (!isEmpty(data.name.trim())) game.name = data.name;
-    if (data.shortName != undefined)
-        if (!isEmpty(data.shortName.trim())) game.shortName = data.shortName;
-    if (data.publisherId != undefined)
-        if (!isEmpty(data.publisherId.trim()))
-            game.publisherId = data.publisherId;
-    if (data.publisher != undefined)
-        if (!isEmpty(data.publisher.trim())) game.publisher = data.publisher;
+    if (!isUndefinedOrEmpty(data.name)) 
+        game.name = data.name;
+    if (!isUndefinedOrEmpty(data.shortName))
+        game.shortName = data.shortName;
+    if (!isUndefinedOrEmpty(data.publisherId))
+        game.publisherId = data.publisherId;
+    if (!isUndefinedOrEmpty(data.publisher))
+        game.publisher = data.publisher;
     if (data.timesCompleted !== undefined)
         game.timesCompleted = data.timesCompleted;
+    if (data.firstReleaseDate != undefined)
+        game.firstReleaseDate = data.firstReleaseDate
+    if (data.ageRatings != undefined)
+        game.ageRatings = data.ageRatings
+    if (data.criticsRating != undefined)
+        game.criticsRating = data.criticsRating
+    if (data.criticsRatingCount != undefined)
+        game.criticsRatingCount = data.criticsRatingCount
+    if (data.userRating != undefined)
+        game.userRating = data.userRating
+    if (data.userRatingCount != undefined)
+        game.userRatingCount = data.userRatingCount
+    if (data.totalRating != undefined)
+        game.totalRating = data.totalRating
+    if (data.totalRatingCount != undefined)
+        game.totalRatingCount = data.totalRatingCount
+    if (data.genres != undefined)
+        game.genres = data.genres
+    if (!isUndefinedOrEmpty(data.storyline))
+        game.storyline = data.storyline
+    if (!isUndefinedOrEmpty(data.summary))
+        game.summary = data.summary
+    if (!isUndefinedOrEmpty(data.url))
+        game.url = data.url
 
     return game;
 };
@@ -65,12 +93,12 @@ exports.reduceGameDetails = data => {
 exports.reducePlatformDetails = data => {
     let platform = {};
 
-    if (data.imageUri != undefined)
-        if (!isEmpty(data.imageUri.trim())) platform.imageUri = data.imageUri;
-    if (data.name != undefined)
-        if (!isEmpty(data.name.trim())) platform.name = data.name;
-    if (data.color != undefined)
-        if (!isEmpty(data.color.trim())) platform.color = data.color;
+    if (!isUndefinedOrEmpty(data.imageUri))
+        platform.imageUri = data.imageUri;
+    if (!isUndefinedOrEmpty(data.name))
+        platform.name = data.name;
+    if (!isUndefinedOrEmpty(data.color))
+        platform.color = data.color;
 
     return platform;
 };
