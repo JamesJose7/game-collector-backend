@@ -1,4 +1,5 @@
 const functions = require('firebase-functions');
+const cors = require('cors')
 const app = require('express')();
 const FBAuth = require('./util/fbAuth');
 
@@ -35,6 +36,9 @@ const {
 const { getUserStats } = require('./handlers/stats');
 const { twitchAuth } = require('./handlers/igdb');
 const { getGameHours } = require('./handlers/howlongtobeat');
+
+// Allow cross origin requests
+app.use(cors({ origin: true }));
 
 // User routes
 app.post('/signup', signup);
