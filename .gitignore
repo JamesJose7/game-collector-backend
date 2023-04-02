@@ -66,3 +66,6 @@ node_modules/
 
 functions/db_migration/prev_db.json
 functions/db_migration/temp.json
+
+#emulators
+database_backups/
