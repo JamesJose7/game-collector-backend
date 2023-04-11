@@ -66,6 +66,7 @@ node_modules/
 
 functions/db_migration/prev_db.json
 functions/db_migration/temp.json
+functions/util/service-account-file.json
 
 #emulators
 database_backups/
