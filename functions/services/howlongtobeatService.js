@@ -1,16 +1,12 @@
 const levenshtein = require('fast-levenshtein');
-const axios = require('axios').default;
+const hltb = require('howlongtobeat');
+const hltbService = new hltb.HowLongToBeatService();
 
 exports.searchGame = (gameName) => {
     return new Promise((resolve, reject) => {
-        const headers = {
-            'Referer': 'https://howlongtobeat.com/'
-        }
-        axios.post('https://www.howlongtobeat.com/api/search', buildRequestBody(gameName), {
-                    headers: headers
-            })
+        hltbService.search(gameName)
             .then(response => {
-                const games = response.data.data.map(gameData => parseGameData(gameData, gameName))
+                const games = response.map(gameData => parseGameData(gameData, gameName))
                 resolve(games);
             })
             .catch((err) => {
@@ -19,64 +15,18 @@ exports.searchGame = (gameName) => {
     });
 }
 
-const buildRequestBody = (gameName) => {
-    return {
-        searchType: "games",
-        searchTerms: [
-            gameName
-        ],
-        searchPage: 1,
-        size: 100,
-        searchOptions: {
-            games: {
-                userId: 0,
-                platform: "",
-                sortCategory: "popular",
-                rangeCategory: "main",
-                rangeTime: {
-                    min: 0,
-                    max: 0
-                },
-                gameplay: {
-                    perspective: "",
-                    flow: "",
-                    genre: ""
-                },
-                modifier: ""
-            },
-            users: {
-                sortCategory: "postcount"
-            },
-            filter: "",
-            sort: 0,
-            randomizer: 0
-        }
-    }
-}
-
 const parseGameData = (game, searchTerm) => {
     return {
-        id: game.game_id,
-        name: game.game_name,
-        imageUrl: 'https://howlongtobeat.com/games/' + game.game_image,
+        id: game.id,
+        name: game.name,
+        imageUrl: game.imageUrl,
 //        timeLabels: [ [Array], [Array], [Array] ],
-        gameplayMain: getTimeInHours(game.comp_main),
-        gameplayMainExtra: getTimeInHours(game.comp_plus),
-        gameplayCompletionist: getTimeInHours(game.comp_100),
-        similarity: calcDistancePercentage(game.game_name, searchTerm),
+        gameplayMain: game.gameplayMain,
+        gameplayMainExtra: game.gameplayMainExtra,
+        gameplayCompletionist: game.gameplayCompletionist,
+        similarity: calcDistancePercentage(game.name, searchTerm),
         searchTerm: searchTerm
     };
-}
-
-const getTimeInHours = (gameTime) => {
-    const hours = gameTime / 3600;
-    let hoursRounded
-    if ((hours % 1) >= 0.5) {
-        hoursRounded = Math.floor(hours) + 0.5;
-    } else {
-        hoursRounded = Math.floor(hours);
-    }
-    return hoursRounded;
 }
 
 /**
@@ -89,8 +39,6 @@ const getTimeInHours = (gameTime) => {
 const calcDistancePercentage = (text, term) => {
     let longer = text.toString().toLowerCase().trim();
     let shorter = term.toString().toLowerCase().trim();
-    console.log(text)
-    console.log(shorter)
     if (longer.length < shorter.length) {
         // longer should always have
         // greater length
