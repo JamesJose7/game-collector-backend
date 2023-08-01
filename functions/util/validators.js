@@ -54,7 +54,7 @@ exports.reduceGameDetails = data => {
     if (data.isPhysical !== undefined) game.isPhysical = data.isPhysical;
     if (!isUndefinedOrEmpty(data.name)) 
         game.name = data.name;
-    if (!isUndefinedOrEmpty(data.shortName))
+    if (!data.shortName !== undefined)
         game.shortName = data.shortName;
     if (!isUndefinedOrEmpty(data.publisherId))
         game.publisherId = data.publisherId;
