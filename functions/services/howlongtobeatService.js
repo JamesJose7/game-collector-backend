@@ -10,7 +10,7 @@ exports.searchGame = (gameName) => {
                 resolve(games);
             })
             .catch((err) => {
-                reject(err.message);
+                reject(err);
             });
     });
 }
