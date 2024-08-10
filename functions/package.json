@@ -10,7 +10,7 @@
     "postinstall": "patch-package"
   },
   "engines": {
-    "node": "10"
+    "node": "18"
   },
   "dependencies": {
     "axios": "^0.19.2",
