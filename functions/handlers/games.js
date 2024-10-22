@@ -303,9 +303,12 @@ exports.toggleGameCompletion = (req, res) => {
                 timesCompleted = 1;
             else if (timesCompleted > 0)
                 timesCompleted = 0;
+            // Mark completion date if completed
+            let completionDate = ""
+            if (timesCompleted > 0) completionDate = new Date().toISOString();
             // Update times completed
             db.doc(`/games/${req.params.gameId}`)
-                .update({ timesCompleted })
+                .update({ timesCompleted, completionDate })
                 .then(() => {
                     // Response status
                     return res.json({ 
