@@ -15,23 +15,73 @@ index b0536f6..833f46a 100644
  }
 \ No newline at end of file
 diff --git a/node_modules/howlongtobeat/dist/main/hltbsearch.js b/node_modules/howlongtobeat/dist/main/hltbsearch.js
-index 16b1e47..96f3254 100644
+index 16b1e47..06d158f 100644
 --- a/node_modules/howlongtobeat/dist/main/hltbsearch.js
 +++ b/node_modules/howlongtobeat/dist/main/hltbsearch.js
-@@ -8,56 +8,61 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
+@@ -1,112 +1,241 @@
+ "use strict";
++var __assign = (this && this.__assign) || function () {
++    __assign = Object.assign || function(t) {
++        for (var s, i = 1, n = arguments.length; i < n; i++) {
++            s = arguments[i];
++            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
++                t[p] = s[p];
++        }
++        return t;
++    };
++    return __assign.apply(this, arguments);
++};
+ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
++    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+     return new (P || (P = Promise))(function (resolve, reject) {
+         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
++        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+         step((generator = generator.apply(thisArg, _arguments || [])).next());
      });
  };
++var __generator = (this && this.__generator) || function (thisArg, body) {
++    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
++    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
++    function verb(n) { return function (v) { return step([n, v]); }; }
++    function step(op) {
++        if (f) throw new TypeError("Generator is already executing.");
++        while (g && (g = 0, op[0] && (_ = 0)), _) try {
++            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
++            if (y = 0, t) op = [op[0] & 2, t.value];
++            switch (op[0]) {
++                case 0: case 1: t = op; break;
++                case 4: _.label++; return { value: op[1], done: false };
++                case 5: _.label++; y = op[1]; op = [0]; continue;
++                case 7: op = _.ops.pop(); _.trys.pop(); continue;
++                default:
++                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
++                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
++                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
++                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
++                    if (t[2]) _.ops.pop();
++                    _.trys.pop(); continue;
++            }
++            op = body.call(thisArg, _);
++        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
++        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
++    }
++};
  Object.defineProperty(exports, "__esModule", { value: true });
 -const axios = require('axios');
 -const UserAgent = require('user-agents');
-+const axios = require("axios");
-+const UserAgent = require("user-agents");
-+const cheerio = require("cheerio");
++exports.HltbSearch = void 0;
++var axios = require("axios");
++var UserAgent = require("user-agents");
++var cheerio = require("cheerio");
  /**
   * Takes care about the http connection and response handling
   */
- class HltbSearch {
-     constructor() {
+-class HltbSearch {
+-    constructor() {
++var HltbSearch = /** @class */ (function () {
++    function HltbSearch() {
          this.payload = {
 -            "searchType": "games",
 -            "searchTerms": [],
@@ -87,112 +137,224 @@ index 16b1e47..96f3254 100644
 +            },
          };
      }
-     detailHtml(gameId, signal) {
-         return __awaiter(this, void 0, void 0, function* () {
-             try {
+-    detailHtml(gameId, signal) {
+-        return __awaiter(this, void 0, void 0, function* () {
+-            try {
 -                let result = yield axios.get(`${HltbSearch.DETAIL_URL}${gameId}`, {
-+                let result = yield axios
-+                    .get(`${HltbSearch.DETAIL_URL}${gameId}`, {
-                     headers: {
+-                    headers: {
 -                        'User-Agent': new UserAgent().toString(),
 -                        'origin': 'https://howlongtobeat.com',
 -                        'referer': 'https://howlongtobeat.com'
-+                        "User-Agent": new UserAgent().toString(),
-+                        origin: "https://howlongtobeat.com",
-+                        referer: "https://howlongtobeat.com",
-                     },
-                     timeout: 20000,
-                     signal,
+-                    },
+-                    timeout: 20000,
+-                    signal,
 -                }).catch(e => { throw e; });
-+                })
-+                    .catch((e) => {
-+                    throw e;
-+                });
-                 return result.data;
-             }
-             catch (error) {
-@@ -78,12 +83,16 @@ class HltbSearch {
-             let search = Object.assign({}, this.payload);
-             search.searchTerms = query;
-             try {
+-                return result.data;
+-            }
+-            catch (error) {
+-                if (error) {
+-                    throw new Error(error);
+-                }
+-                else if (error.response.status !== 200) {
+-                    throw new Error(`Got non-200 status code from howlongtobeat.com [${error.response.status}]
+-          ${JSON.stringify(error.response)}
+-        `);
++    HltbSearch.prototype.detailHtml = function (gameId, signal) {
++        return __awaiter(this, void 0, void 0, function () {
++            var result, error_1;
++            return __generator(this, function (_a) {
++                switch (_a.label) {
++                    case 0:
++                        _a.trys.push([0, 2, , 3]);
++                        return [4 /*yield*/, axios
++                                .get("".concat(HltbSearch.DETAIL_URL).concat(gameId), {
++                                headers: {
++                                    "User-Agent": new UserAgent().toString(),
++                                    origin: "https://howlongtobeat.com",
++                                    referer: "https://howlongtobeat.com",
++                                },
++                                timeout: 20000,
++                                signal: signal,
++                            })
++                                .catch(function (e) {
++                                throw e;
++                            })];
++                    case 1:
++                        result = _a.sent();
++                        return [2 /*return*/, result.data];
++                    case 2:
++                        error_1 = _a.sent();
++                        if (error_1) {
++                            throw new Error(error_1);
++                        }
++                        else if (error_1.response.status !== 200) {
++                            throw new Error("Got non-200 status code from howlongtobeat.com [".concat(error_1.response.status, "]\n          ").concat(JSON.stringify(error_1.response), "\n        "));
++                        }
++                        return [3 /*break*/, 3];
++                    case 3: return [2 /*return*/];
+                 }
+-            }
++            });
+         });
+-    }
+-    search(query, signal) {
+-        return __awaiter(this, void 0, void 0, function* () {
+-            // Use built-in javascript URLSearchParams as a drop-in replacement to create axios.post required data param
+-            let search = Object.assign({}, this.payload);
+-            search.searchTerms = query;
+-            try {
 -                let result = yield axios.post(HltbSearch.SEARCH_URL, search, {
-+                if (!this.searchKey) {
-+                    this.searchKey = yield this.getSearchKey();
-+                }
-+                const searchUrlWithKey = HltbSearch.SEARCH_URL + this.searchKey;
-+                let result = yield axios.post(searchUrlWithKey, search, {
-                     headers: {
+-                    headers: {
 -                        'User-Agent': new UserAgent().toString(),
 -                        'content-type': 'application/json',
 -                        'origin': 'https://howlongtobeat.com/',
 -                        'referer': 'https://howlongtobeat.com/'
-+                        "User-Agent": new UserAgent().toString(),
-+                        "content-type": "application/json",
-+                        origin: "https://howlongtobeat.com/",
-+                        referer: "https://howlongtobeat.com/",
-                     },
-                     timeout: 20000,
-                     signal,
-@@ -103,10 +112,48 @@ class HltbSearch {
-             }
-         });
-     }
-+    getSearchKey(checkAllScripts = false) {
-+        return __awaiter(this, void 0, void 0, function* () {
-+            const res = yield axios.get(HltbSearch.BASE_URL, {
-+                headers: {
-+                    "User-Agent": new UserAgent().toString(),
-+                    origin: "https://howlongtobeat.com",
-+                    referer: "https://howlongtobeat.com",
-+                },
+-                    },
+-                    timeout: 20000,
+-                    signal,
+-                });
+-                // console.log('Result', JSON.stringify(result.data));
+-                return result.data;
+-            }
+-            catch (error) {
+-                if (error) {
+-                    throw new Error(error);
++    };
++    HltbSearch.prototype.search = function (query, signal) {
++        return __awaiter(this, void 0, void 0, function () {
++            var search, _a, searchUrlWithKey, result, error_2;
++            return __generator(this, function (_b) {
++                switch (_b.label) {
++                    case 0:
++                        search = __assign({}, this.payload);
++                        search.searchTerms = query;
++                        _b.label = 1;
++                    case 1:
++                        _b.trys.push([1, 5, , 6]);
++                        if (!!this.searchKey) return [3 /*break*/, 3];
++                        _a = this;
++                        return [4 /*yield*/, this.getSearchKey()];
++                    case 2:
++                        _a.searchKey = _b.sent();
++                        _b.label = 3;
++                    case 3:
++                        searchUrlWithKey = HltbSearch.SEARCH_URL + this.searchKey;
++                        return [4 /*yield*/, axios.post(searchUrlWithKey, search, {
++                                headers: {
++                                    "User-Agent": new UserAgent().toString(),
++                                    "content-type": "application/json",
++                                    origin: "https://howlongtobeat.com/",
++                                    referer: "https://howlongtobeat.com/",
++                                },
++                                timeout: 20000,
++                                signal: signal,
++                            })];
++                    case 4:
++                        result = _b.sent();
++                        // console.log('Result', JSON.stringify(result.data));
++                        return [2 /*return*/, result.data];
++                    case 5:
++                        error_2 = _b.sent();
++                        if (error_2) {
++                            throw new Error(error_2);
++                        }
++                        else if (error_2.response.status !== 200) {
++                            throw new Error("Got non-200 status code from howlongtobeat.com [".concat(error_2.response.status, "]\n          ").concat(JSON.stringify(error_2.response), "\n        "));
++                        }
++                        return [3 /*break*/, 6];
++                    case 6: return [2 /*return*/];
+                 }
+-                else if (error.response.status !== 200) {
+-                    throw new Error(`Got non-200 status code from howlongtobeat.com [${error.response.status}]
+-          ${JSON.stringify(error.response)}
+-        `);
 +            });
-+            const html = res.data;
-+            const $ = cheerio.load(html);
-+            const scripts = $("script[src]");
-+            for (const el of scripts) {
-+                const src = $(el).attr("src");
-+                if (!checkAllScripts && !src.includes("_app-")) {
-+                    continue;
-+                }
-+                const scriptUrl = HltbSearch.BASE_URL + src;
-+                try {
-+                    const res = yield axios.get(scriptUrl, {
-+                        headers: {
-+                            "User-Agent": new UserAgent().toString(),
-+                            origin: "https://howlongtobeat.com",
-+                            referer: "https://howlongtobeat.com",
-+                        },
-+                    });
-+                    const scriptText = res.data;
-+                    const matches = [...scriptText.matchAll(HltbSearch.SEARCH_KEY_PATTERN)];
-+                    return matches[0][1];
-+                }
-+                catch (error) {
-+                    continue;
-+                }
-+            }
-+            throw new Error("Could not find search key");
 +        });
-+    }
- }
++    };
++    HltbSearch.prototype.getSearchKey = function () {
++        return __awaiter(this, arguments, void 0, function (checkAllScripts) {
++            var res, html, $, scripts, _i, scripts_1, el, src, scriptUrl, res_1, scriptText, pattern, matches, parts, key, error_3;
++            if (checkAllScripts === void 0) { checkAllScripts = false; }
++            return __generator(this, function (_a) {
++                switch (_a.label) {
++                    case 0: return [4 /*yield*/, axios.get(HltbSearch.BASE_URL, {
++                            headers: {
++                                "User-Agent": new UserAgent().toString(),
++                                origin: "https://howlongtobeat.com",
++                                referer: "https://howlongtobeat.com",
++                            },
++                        })];
++                    case 1:
++                        res = _a.sent();
++                        html = res.data;
++                        $ = cheerio.load(html);
++                        scripts = $("script[src]");
++                        _i = 0, scripts_1 = scripts;
++                        _a.label = 2;
++                    case 2:
++                        if (!(_i < scripts_1.length)) return [3 /*break*/, 7];
++                        el = scripts_1[_i];
++                        src = $(el).attr("src");
++                        if (!checkAllScripts && !src.includes("_app-")) {
++                            return [3 /*break*/, 6];
++                        }
++                        scriptUrl = HltbSearch.BASE_URL + src;
++                        _a.label = 3;
++                    case 3:
++                        _a.trys.push([3, 5, , 6]);
++                        return [4 /*yield*/, axios.get(scriptUrl, {
++                                headers: {
++                                    "User-Agent": new UserAgent().toString(),
++                                    origin: "https://howlongtobeat.com",
++                                    referer: "https://howlongtobeat.com",
++                                },
++                            })];
++                    case 4:
++                        res_1 = _a.sent();
++                        scriptText = res_1.data;
++                        pattern = /\/api\/search\/"(?:\.concat\("[^"]*"\))*/g;
++                        matches = scriptText.match(pattern) || [];
++                        parts = matches.join('').split('.concat');
++                        // Clean up unwanted characters from the parts (ignore the first part)
++                        parts = parts.slice(1).map(function (part) { return part.replace(/["\(\)\[\]']/g, ''); });
++                        key = parts.join('');
++                        return [2 /*return*/, key || null]; // Return the key or null if empty
++                    case 5:
++                        error_3 = _a.sent();
++                        return [3 /*break*/, 6];
++                    case 6:
++                        _i++;
++                        return [3 /*break*/, 2];
++                    case 7: throw new Error("Could not find search key");
+                 }
+-            }
++            });
+         });
+-    }
+-}
 -HltbSearch.BASE_URL = 'https://howlongtobeat.com/';
-+HltbSearch.BASE_URL = "https://howlongtobeat.com/";
- HltbSearch.DETAIL_URL = `${HltbSearch.BASE_URL}game?id=`;
+-HltbSearch.DETAIL_URL = `${HltbSearch.BASE_URL}game?id=`;
 -HltbSearch.SEARCH_URL = `${HltbSearch.BASE_URL}api/search`;
-+HltbSearch.SEARCH_URL = `${HltbSearch.BASE_URL}api/search/`;
- HltbSearch.IMAGE_URL = `${HltbSearch.BASE_URL}games/`;
-+HltbSearch.SEARCH_KEY_PATTERN = /"\/api\/search\/".concat\("([a-zA-Z0-9]+)"\)/g;
+-HltbSearch.IMAGE_URL = `${HltbSearch.BASE_URL}games/`;
++    };
++    HltbSearch.BASE_URL = "https://howlongtobeat.com/";
++    HltbSearch.DETAIL_URL = "".concat(HltbSearch.BASE_URL, "game?id=");
++    HltbSearch.SEARCH_URL = "".concat(HltbSearch.BASE_URL, "api/search/");
++    HltbSearch.IMAGE_URL = "".concat(HltbSearch.BASE_URL, "games/");
++    HltbSearch.SEARCH_KEY_PATTERN = /"\/api\/search\/".concat\("([a-zA-Z0-9]+)"\)/g;
++    return HltbSearch;
++}());
  exports.HltbSearch = HltbSearch;
  //# sourceMappingURL=hltbsearch.js.map
 \ No newline at end of file
 diff --git a/node_modules/howlongtobeat/dist/main/hltbsearch.js.map b/node_modules/howlongtobeat/dist/main/hltbsearch.js.map
-index 404fc2d..0fdf66c 100644
+index 404fc2d..be4e85b 100644
 --- a/node_modules/howlongtobeat/dist/main/hltbsearch.js.map
 +++ b/node_modules/howlongtobeat/dist/main/hltbsearch.js.map
 @@ -1 +1 @@
 -{"version":3,"file":"hltbsearch.js","sourceRoot":"","sources":["../../src/main/hltbsearch.ts"],"names":[],"mappings":"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"}
 \ No newline at end of file
-+{"version":3,"file":"hltbsearch.js","sourceRoot":"","sources":["../../src/main/hltbsearch.ts"],"names":[],"mappings":"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"}
++{"version":3,"file":"hltbsearch.js","sourceRoot":"","sources":["hltbsearch.ts"],"names":[],"mappings":"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"}
 \ No newline at end of file
 diff --git a/node_modules/howlongtobeat/dist/main/howlongtobeat.js b/node_modules/howlongtobeat/dist/main/howlongtobeat.js
 index 412d040..c4be795 100644
@@ -494,7 +656,7 @@ index b5de261..31a192b 100644
 +{"version":3,"file":"howlongtobeat.integration.test.js","sourceRoot":"","sources":["../../src/test/howlongtobeat.integration.test.ts"],"names":[],"mappings":";;AAAA,6BAA6B;AAE7B,yDAA6D;AAE7D,MAAM,MAAM,GAAG,IAAI,CAAC,MAAM,CAAC;AAE3B,QAAQ,CAAC,0CAA0C,EAAE,GAAG,EAAE;IACxD,QAAQ,CAAC,mBAAmB,EAAE,GAAG,EAAE;QACjC,EAAE,CAAC,yCAAyC,EAAE,GAAG,EAAE;YACjD,OAAO,IAAI,oCAAoB,EAAE,CAAC,MAAM,CAAC,MAAM,CAAC,CAAC,IAAI,CAAC,CAAC,KAAK,EAAE,EAAE;gBAC9D,sBAAsB;gBACtB,MAAM,CAAC,SAAS,CAAC,KAAK,CAAC,CAAC;gBACxB,MAAM,CAAC,WAAW,CAAC,KAAK,CAAC,EAAE,EAAE,MAAM,CAAC,CAAC;gBACrC,MAAM,CAAC,WAAW,CAAC,KAAK,CAAC,IAAI,EAAE,YAAY,CAAC,CAAC;gBAC7C,MAAM,CAAC,WAAW,CAAC,KAAK,CAAC,UAAU,EAAE,YAAY,CAAC,CAAC;gBACnD,MAAM,CAAC,QAAQ,CAAC,KAAK,CAAC,QAAQ,CAAC,CAAC;gBAChC,MAAM,CAAC,OAAO,CAAC,KAAK,CAAC,SAAS,CAAC,CAAC;gBAChC,MAAM,CAAC,WAAW,CAAC,KAAK,CAAC,SAAS,CAAC,MAAM,EAAE,CAAC,CAAC,CAAC;gBAC9C,2BAA2B;gBAC3B,MAAM,CAAC,WAAW,CAAC,KAAK,CAAC,UAAU,CAAC,MAAM,EAAE,CAAC,CAAC,CAAC;gBAC/C,MAAM,CAAC,MAAM,CACX,KAAK,CAAC,WAAW,CAAC,QAAQ,CACxB,mDAAmD,CACpD,CACF,CAAC;gBACF,MAAM,CAAC,MAAM,CAAC,KAAK,CAAC,YAAY,GAAG,EAAE,CAAC,CAAC;gBACvC,MAAM,CAAC,MAAM,CAAC,KAAK,CAAC,qBAAqB,GAAG,GAAG,CAAC,CAAC;YACnD,CAAC,CAAC,CAAC;QACL,CAAC,CAAC,CAAC;QAEH,EAAE,CAAC,kDAAkD,EAAE,GAAG,EAAE;YAC1D,MAAM,eAAe,GAAG,IAAI,eAAe,EAAE,CAAC;YAC9C,eAAe,CAAC,KAAK,EAAE,CAAC;YACxB,OAAO,IAAI,oCAAoB,EAAE;iBAC9B,MAAM,CAAC,MAAM,EAAE,eAAe,CAAC,MAAM,CAAC;iBACtC,IAAI,CAAC,GAAG,EAAE;gBACT,MAAM,CAAC,IAAI,EAAE,CAAC;YAChB,CAAC,CAAC;iBACD,KAAK,CAAC,CAAC,CAAC,EAAE,EAAE;gBACX,MAAM,CAAC,OAAO,CAAC,CAAC,CAAC,OAAO,CAAC,WAAW,EAAE,EAAE,QAAQ,CAAC,CAAC;YACpD,CAAC,CAAC,CAAC;QACP,CAAC,CAAC,CAAC;QAEH,EAAE,CAAC,yCAAyC,EAAE,GAAG,EAAE;YACjD,OAAO,IAAI,oCAAoB,EAAE;iBAC9B,MAAM,CAAC,KAAK,CAAC;iBACb,IAAI,CAAC,GAAG,EAAE;gBACT,MAAM,CAAC,IAAI,EAAE,CAAC;YAChB,CAAC,CAAC;iBACD,KAAK,CAAC,CAAC,CAAC,EAAE,EAAE;gBACX,MAAM,CAAC,IAAI,CAAC,CAAC,CAAC,OAAO,CAAC,CAAC;YACzB,CAAC,CAAC,CAAC;QACP,CAAC,CAAC,CAAC;IACL,CAAC,CAAC,CAAC;IAEH,QAAQ,CAAC,mBAAmB,EAAE,GAAG,EAAE;QACjC,EAAE,CAAC,wDAAwD,EAAE,GAAG,EAAE;YAChE,OAAO,IAAI,oCAAoB,EAAE,CAAC,MAAM,CAAC,OAAO,CAAC,CAAC,IAAI,CAAC,CAAC,MAAM,EAAE,EAAE;gBAChE,MAAM,CAAC,SAAS,CAAC,MAAM,CAAC,CAAC;gBACzB,MAAM,CAAC,WAAW,CAAC,MAAM,CAAC,MAAM,EAAE,CAAC,CAAC,CAAC;YACvC,CAAC,CAAC,CAAC;QACL,CAAC,CAAC,CAAC;QAEH,EAAE,CAAC,yEAAyE,EAAE,GAAG,EAAE;YACjF,OAAO,IAAI,oCAAoB,EAAE;iBAC9B,MAAM,CAAC,gBAAgB,CAAC;iBACxB,IAAI,CAAC,CAAC,MAAM,EAAE,EAAE;gBACf,MAAM,CAAC,SAAS,CAAC,MAAM,CAAC,CAAC;gBACzB,MAAM,CAAC,MAAM,CAAC,MAAM,CAAC,MAAM,IAAI,CAAC,CAAC,CAAC;gBAClC,MAAM,CAAC,WAAW,CAAC,MAAM,CAAC,CAAC,CAAC,CAAC,EAAE,EAAE,OAAO,CAAC,CAAC;gBAC1C,MAAM,CAAC,WAAW,CAAC,MAAM,CAAC,CAAC,CAAC,CAAC,IAAI,EAAE,gBAAgB,CAAC,CAAC;gBACrD,MAAM,CAAC,MAAM,CAAC,MAAM,CAAC,CAAC,CAAC,CAAC,YAAY,GAAG,EAAE,CAAC,CAAC;gBAC3C,MAAM,CAAC,MAAM,CAAC,MAAM,CAAC,CAAC,CAAC,CAAC,qBAAqB,GAAG,EAAE,CAAC,CAAC;YACtD,CAAC,CAAC,CAAC;QACP,CAAC,CAAC,CAAC;QAEH,EAAE,CAAC,2CAA2C,EAAE,GAAG,EAAE;YACnD,MAAM,eAAe,GAAG,IAAI,eAAe,EAAE,CAAC;YAC9C,eAAe,CAAC,KAAK,EAAE,CAAC;YACxB,OAAO,IAAI,oCAAoB,EAAE;iBAC9B,MAAM,CAAC,gBAAgB,EAAE,eAAe,CAAC,MAAM,CAAC;iBAChD,IAAI,CAAC,GAAG,EAAE;gBACT,MAAM,CAAC,IAAI,EAAE,CAAC;YAChB,CAAC,CAAC;iBACD,KAAK,CAAC,CAAC,CAAC,EAAE,EAAE;gBACX,MAAM,CAAC,OAAO,CAAC,CAAC,CAAC,OAAO,CAAC,WAAW,EAAE,EAAE,QAAQ,CAAC,CAAC;YACpD,CAAC,CAAC,CAAC;QACP,CAAC,CAAC,CAAC;QAEH,EAAE,CAAC,wFAAwF,EAAE,GAAG,EAAE;YAChG,OAAO,IAAI,oCAAoB,EAAE;iBAC9B,MAAM,CAAC,kBAAkB,CAAC;iBAC1B,IAAI,CAAC,CAAC,MAAM,EAAE,EAAE;gBACf,MAAM,CAAC,SAAS,CAAC,MAAM,CAAC,CAAC;gBACzB,MAAM,CAAC,WAAW,CAAC,MAAM,CAAC,MAAM,EAAE,CAAC,CAAC,CAAC;gBACrC,8CAA8C;YAChD,CAAC,CAAC,CAAC;QACP,CAAC,CAAC,CAAC;QAEH,EAAE,CAAC,iFAAiF,EAAE,GAAG,EAAE;YACzF,OAAO,IAAI,oCAAoB,EAAE,CAAC,MAAM,CAAC,OAAO,CAAC,CAAC,IAAI,CAAC,CAAC,MAAM,EAAE,EAAE;gBAChE,uBAAuB;gBACvB,MAAM,CAAC,SAAS,CAAC,MAAM,CAAC,CAAC;gBACzB,MAAM,CAAC,MAAM,CAAC,MAAM,CAAC,MAAM,GAAG,CAAC,CAAC,CAAC;gBACjC,MAAM,CAAC,WAAW,CAAC,MAAM,CAAC,CAAC,CAAC,CAAC,YAAY,EAAE,CAAC,CAAC,CAAC;YAChD,CAAC,CAAC,CAAC;QACL,CAAC,CAAC,CAAC;IACL,CAAC,CAAC,CAAC;AACL,CAAC,CAAC,CAAC"}
 \ No newline at end of file
 diff --git a/node_modules/howlongtobeat/src/main/hltbsearch.ts b/node_modules/howlongtobeat/src/main/hltbsearch.ts
-index a9bf05a..bebbb8f 100644
+index a9bf05a..fa0f587 100644
 --- a/node_modules/howlongtobeat/src/main/hltbsearch.ts
 +++ b/node_modules/howlongtobeat/src/main/hltbsearch.ts
 @@ -1,67 +1,75 @@
@@ -612,7 +774,7 @@ index a9bf05a..bebbb8f 100644
            ${JSON.stringify(error.response)}
          `);
        }
-@@ -73,27 +81,79 @@ export class HltbSearch {
+@@ -73,27 +81,94 @@ export class HltbSearch {
      let search = { ...this.payload };
      search.searchTerms = query;
      try {
@@ -694,8 +856,23 @@ index a9bf05a..bebbb8f 100644
 +        });
 +
 +        const scriptText = res.data;
-+        const matches = [...scriptText.matchAll(HltbSearch.SEARCH_KEY_PATTERN)];
-+        return matches[0][1];
++        
++        // Define the regex pattern
++        const pattern = /\/api\/search\/"(?:\.concat\("[^"]*"\))*/g;
++
++        // Find all matches using the regex pattern
++        const matches = scriptText.match(pattern) || [];
++
++        // Split matches by '.concat' and process each part
++        let parts = matches.join('').split('.concat');
++
++        // Clean up unwanted characters from the parts (ignore the first part)
++        parts = parts.slice(1).map(part => part.replace(/["\(\)\[\]']/g, ''));
++
++        // Join all cleaned parts to form the final key
++        const key = parts.join('');
++
++        return key || null; // Return the key or null if empty
 +      } catch (error) {
 +        continue;
 +      }
