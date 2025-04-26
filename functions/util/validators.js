@@ -80,6 +80,8 @@ exports.reduceGameDetails = data => {
         game.totalRatingCount = data.totalRatingCount
     if (data.genres != undefined)
         game.genres = data.genres
+    if (data.genresNames != undefined)
+        game.genresNames = data.genresNames
     if (!isUndefinedOrEmpty(data.storyline))
         game.storyline = data.storyline
     if (!isUndefinedOrEmpty(data.summary))
