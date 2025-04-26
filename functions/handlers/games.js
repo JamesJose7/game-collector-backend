@@ -50,6 +50,7 @@ exports.postOneGame = (req, res) => {
         totalRating: req.body.totalRating,
         totalRatingCount: req.body.totalRatingCount,
         genres: req.body.genres,
+        genresNames: req.body.genresNames,
         storyline: req.body.storyline,
         summary: req.body.summary,
         url: req.body.url
