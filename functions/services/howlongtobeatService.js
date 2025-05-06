@@ -2,7 +2,7 @@ const levenshtein = require('fast-levenshtein');
 const hltb = require('howlongtobeat');
 const hltbService = new hltb.HowLongToBeatService();
 
-const axios = require('axios').default;
+const axios = require('axios');
 const { hltbApi } = require('../util/igdb');
 
 exports.searchGame = (gameName) => {
