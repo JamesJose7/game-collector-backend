@@ -8,12 +8,12 @@ exports.getGameHours = (req, res) => {
     }
 
     searchGame(gameName)
-        .then(games => {
-            if (games.length > 0) {
-                let mostSimilarGame = games.reduce((maxGame, currentGame) => {
-                    return maxGame.similarity > currentGame.similarity ? maxGame : currentGame;
-                });
-                return res.json(mostSimilarGame);
+        .then(game => {
+            if (game !== undefined) {
+                // let mostSimilarGame = games.reduce((maxGame, currentGame) => {
+                //     return maxGame.similarity > currentGame.similarity ? maxGame : currentGame;
+                // });
+                return res.json(game);
             } else {
                 return res.status(404).json({ message: 'No games found' });
             }
@@ -21,6 +21,6 @@ exports.getGameHours = (req, res) => {
         .catch(err => {
             console.error(err.message);
             console.error(err)
-            return res.status(500).json({ error: 'Something went wrong' });
+            return res.status(500).json({ error: 'Something went wrong - Check HLTB API' });
         });
 };

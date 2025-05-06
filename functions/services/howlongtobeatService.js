@@ -2,29 +2,45 @@ const levenshtein = require('fast-levenshtein');
 const hltb = require('howlongtobeat');
 const hltbService = new hltb.HowLongToBeatService();
 
+const axios = require('axios').default;
+const { hltbApi } = require('../util/igdb');
+
 exports.searchGame = (gameName) => {
     return new Promise((resolve, reject) => {
-        hltbService.search(gameName)
+        const urlWithQuery = `${hltbApi}${encodeURI(gameName)}`
+        
+        axios
+            .get(urlWithQuery)
             .then(response => {
-                const games = response.map(gameData => parseGameData(gameData, gameName))
-                resolve(games);
+                console.log(response.data);
+                const game = parseGameData(response.data, gameName)
+                resolve(game);
             })
             .catch((err) => {
                 reject(err);
             });
+
+        // hltbService.search(gameName)
+        //     .then(response => {
+        //         const games = response.map(gameData => parseGameData(gameData, gameName))
+        //         resolve(games);
+        //     })
+        //     .catch((err) => {
+        //         reject(err);
+        //     });
     });
 }
 
 const parseGameData = (game, searchTerm) => {
     return {
-        id: game.id,
-        name: game.name,
-        imageUrl: game.imageUrl,
+        id: game.game_id,
+        name: game.game_name,
+        imageUrl: game.game_image_url,
 //        timeLabels: [ [Array], [Array], [Array] ],
-        gameplayMain: game.gameplayMain,
-        gameplayMainExtra: game.gameplayMainExtra,
-        gameplayCompletionist: game.gameplayCompletionist,
-        similarity: calcDistancePercentage(game.name, searchTerm),
+        gameplayMain: game.main_story,
+        gameplayMainExtra: game.main_extra,
+        gameplayCompletionist: game.completionist,
+        similarity: calcDistancePercentage(game.game_name, searchTerm),
         searchTerm: searchTerm
     };
 }
