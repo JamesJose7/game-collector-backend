@@ -4,7 +4,7 @@ const config = require('../util/config');
 
 const { reduceGameDetails } = require('../util/validators');
 
-const axios = require('axios').default;
+const axios = require('axios');
 const { apiKey } = require('../util/igdb');
 
 // Post a game from user

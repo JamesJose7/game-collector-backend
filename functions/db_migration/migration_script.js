@@ -1,4 +1,4 @@
-const axios = require('axios').default;
+const axios = require('axios');
 const db = require('./prev_db.json');
 
 // Axios config
