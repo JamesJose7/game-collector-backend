@@ -88,6 +88,8 @@ exports.reduceGameDetails = data => {
         game.summary = data.summary
     if (!isUndefinedOrEmpty(data.url))
         game.url = data.url
+    if (!isUndefinedOrEmpty(data.completionDate))
+        game.completionDate = data.completionDate
 
     return game;
 };
