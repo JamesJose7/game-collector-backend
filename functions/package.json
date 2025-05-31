@@ -20,7 +20,7 @@
     "firebase-admin": "^8.6.0",
     "firebase-functions": "^3.21.2",
     "howlongtobeat": "^1.8.0",
-    "patch-package": "^6.4.7"
+    "patch-package": "^8.0.0"
   },
   "devDependencies": {
     "firebase-functions-test": "^0.1.6"
