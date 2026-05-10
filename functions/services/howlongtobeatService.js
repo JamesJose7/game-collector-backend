@@ -3,14 +3,18 @@ const hltb = require('howlongtobeat');
 const hltbService = new hltb.HowLongToBeatService();
 
 const axios = require('axios');
-const { hltbApi } = require('../util/igdb');
+const { hltbApi, apiKey } = require('../util/igdb');
 
 exports.searchGame = (gameName) => {
     return new Promise((resolve, reject) => {
         const urlWithQuery = `${hltbApi}${encodeURI(gameName)}`
         
         axios
-            .get(urlWithQuery)
+            .get(urlWithQuery, {
+                headers: {
+                    "x-api-key": apiKey
+                }
+            })
             .then(response => {
                 console.log(response.data);
                 const game = parseGameData(response.data, gameName)
