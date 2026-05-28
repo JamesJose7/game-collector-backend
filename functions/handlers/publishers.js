@@ -1,4 +1,5 @@
 const { db } = require('../util/admin');
+const logger = require('firebase-functions/logger');
 
 exports.postOnePublisher = (req, res) => {
     if (req.body.name.trim() === '')
@@ -16,8 +17,8 @@ exports.postOnePublisher = (req, res) => {
             res.json(responsePublisher);
         })
         .catch(err => {
-            response.status(500).json({ error: 'Something went wrong' });
-            console.error(err);
+            logger.error(err);
+            res.status(500).json({ error: 'Something went wrong' });
         });
 };
 
@@ -33,7 +34,7 @@ exports.getOnePublisher = (req, res) => {
             return res.json(publisher);
         })
         .catch(err => {
-            console.error(err);
+            logger.error(err);
             return res.status(500).json({ error: err.code });
         });
 };
@@ -53,7 +54,7 @@ exports.getPublishers = (req, res) => {
             return res.json(publishers);
         })
         .catch(err => {
-            console.error(err);
+            logger.error(err);
             return res.status(500).json({ error: err.code });
         });
 };

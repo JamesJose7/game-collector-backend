@@ -1,4 +1,5 @@
 const { searchGame } = require("../services/howlongtobeatService");
+const logger = require('firebase-functions/logger');
 
 exports.getGameHours = (req, res) => {
     let gameName = req.query.name;
@@ -19,8 +20,8 @@ exports.getGameHours = (req, res) => {
             }
         })
         .catch(err => {
-            console.error(err.message);
-            console.error(err)
+            logger.error(err.message);
+            logger.error(err);
             return res.status(500).json({ error: 'Something went wrong - Check HLTB API' });
         });
 };

@@ -1,4 +1,5 @@
 const { admin, db } = require('../util/admin');
+const logger = require('firebase-functions/logger');
 
 const config = require('../util/config');
 
@@ -20,7 +21,7 @@ exports.postOnePlatform = (req, res) => {
             res.json(responsePlatform);
         })
         .catch(err => {
-            console.error(err);
+            logger.error(err);
             res.status(500).json({
                 error: 'Something went wrong, please try again'
             });
@@ -41,7 +42,7 @@ exports.getOnePlatform = (req, res) => {
             return res.json(platformData);
         })
         .catch(err => {
-            console.log(err);
+            logger.error(err);
             res.status(500).json({ error: err.code });
         });
 };
@@ -65,7 +66,7 @@ exports.getPlatformsByUser = (req, res) => {
             return res.json(userPlatforms);
         })
         .catch(err => {
-            console.error(err);
+            logger.error(err);
             return res.status(500).json({ error: err.code });
         });
 };
@@ -80,7 +81,7 @@ exports.editPlatform = (req, res) => {
             return res.json({ message: 'Game edited successfully' });
         })
         .catch(err => {
-            console.error(err);
+            logger.error(err);
             return res.status(500).json({ error: err.code });
         });
 };
@@ -95,22 +96,22 @@ exports.uploadPlatformCover = (req, res) => {
                     .status(404)
                     .json({ error: 'Platform does not exist' });
             else {
-                const BusBoy = require('busboy');
+                const busboy = require('busboy');
                 const path = require('path');
                 const os = require('os');
                 const fs = require('fs');
 
-                const busboy = new BusBoy({ headers: req.headers });
+                const bb = busboy({ headers: req.headers });
 
                 let imageFileName;
                 let imageToBeUploaded = {};
 
-                busboy.on(
+                bb.on(
                     'file',
-                    (fieldname, file, filename, encoding, mimetype) => {
+                    (fieldname, file, { filename, encoding, mimeType }) => {
                         if (
-                            mimetype !== 'image/jpeg' &&
-                            mimetype !== 'image/png'
+                            mimeType !== 'image/jpeg' &&
+                            mimeType !== 'image/png'
                         )
                             return res
                                 .status(400)
@@ -121,11 +122,11 @@ exports.uploadPlatformCover = (req, res) => {
                         ];
                         imageFileName = `${req.params.platformId}.png`;
                         const filepath = path.join(os.tmpdir(), imageFileName);
-                        imageToBeUploaded = { filepath, mimetype };
+                        imageToBeUploaded = { filepath, mimeType };
                         file.pipe(fs.createWriteStream(filepath));
                     }
                 );
-                busboy.on('finish', () => {
+                bb.on('finish', () => {
                     admin
                         .storage()
                         .bucket(`${config.storageBucket}`)
@@ -133,7 +134,7 @@ exports.uploadPlatformCover = (req, res) => {
                             resumable: false,
                             metadata: {
                                 metadata: {
-                                    contentType: imageToBeUploaded.mimetype
+                                    contentType: imageToBeUploaded.mimeType
                                 }
                             }
                         })
@@ -150,11 +151,11 @@ exports.uploadPlatformCover = (req, res) => {
                             });
                         })
                         .catch(err => {
-                            console.error(err);
+                            logger.error(err);
                             return res.status(500).json({ error: err.code });
                         });
                 });
-                busboy.end(req.rawBody);
+                bb.end(req.rawBody);
             }
         });
 };

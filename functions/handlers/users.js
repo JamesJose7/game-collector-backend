@@ -1,9 +1,12 @@
 const { admin, db } = require('../util/admin');
+const logger = require('firebase-functions/logger');
 
 const config = require('../util/config');
 
-const firebase = require('firebase');
-firebase.initializeApp(config);
+const { initializeApp } = require('firebase/app');
+const { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, getIdToken } = require('firebase/auth');
+const app = initializeApp(config);
+const auth = getAuth(app);
 
 const { validateSignupData, validateLoginData } = require('../util/validators');
 
@@ -29,9 +32,8 @@ exports.signup = (request, response) => {
                     .status(400)
                     .json({ username: 'This username is already taken' });
             } else {
-                return firebase
-                    .auth()
-                    .createUserWithEmailAndPassword(
+                return createUserWithEmailAndPassword(
+                        auth,
                         newUser.email,
                         newUser.password
                     );
@@ -39,7 +41,7 @@ exports.signup = (request, response) => {
         })
         .then(data => {
             userId = data.user.uid;
-            return data.user.getIdToken();
+            return getIdToken(data.user);
         })
         .then(idToken => {
             token = idToken;
@@ -55,7 +57,7 @@ exports.signup = (request, response) => {
             return response.status(201).json({ token });
         })
         .catch(err => {
-            console.error(err);
+            logger.error(err);
             if (err.code == 'auth/email-already-in-use') {
                 return response
                     .status(400)
@@ -96,7 +98,7 @@ exports.signupUserdetails = (request, response) => {
             return response.status(201).json({ message: 'Successfully added user details' });
         })
         .catch(err => {
-            console.error(err);
+            logger.error(err);
             return response
                 .status(500)
                 .json({ general: 'Something went wrong, please try again' });
@@ -114,17 +116,15 @@ exports.login = (request, response) => {
 
     if (!valid) return response.status(400).json(errors);
 
-    firebase
-        .auth()
-        .signInWithEmailAndPassword(user.email, user.password)
+    signInWithEmailAndPassword(auth, user.email, user.password)
         .then(data => {
-            return data.user.getIdToken();
+            return getIdToken(data.user);
         })
         .then(token => {
             return response.json({ token });
         })
         .catch(err => {
-            console.error(err);
+            logger.error(err);
             return response
                 .status(403)
                 .json({ general: 'Wrong credentials, please try again' });
@@ -143,7 +143,7 @@ exports.getAuthenticatedUser = (request, response) => {
             }
         })
         .catch(err => {
-            console.error(err);
+            logger.error(err);
             return response.status(500).json({ error: err.code });
         });
 };

@@ -204,22 +204,22 @@ exports.uploadGameCover = (req, res) => {
             if (!doc.exists)
                 return res.status(404).json({ error: 'Game does not exist' });
             else {
-                const BusBoy = require('busboy');
+                const busboy = require('busboy');
                 const path = require('path');
                 const os = require('os');
                 const fs = require('fs');
 
-                const busboy = new BusBoy({ headers: req.headers });
+                const bb = busboy({ headers: req.headers });
 
                 let imageFileName;
                 let imageToBeUploaded = {};
 
-                busboy.on(
+                bb.on(
                     'file',
-                    (fieldname, file, filename, encoding, mimetype) => {
+                    (fieldname, file, { filename, encoding, mimeType }) => {
                         if (
-                            mimetype !== 'image/jpeg' &&
-                            mimetype !== 'image/png'
+                            mimeType !== 'image/jpeg' &&
+                            mimeType !== 'image/png'
                         )
                             return res
                                 .status(400)
@@ -230,11 +230,11 @@ exports.uploadGameCover = (req, res) => {
                         ];
                         imageFileName = `${req.params.gameId}.png`;
                         const filepath = path.join(os.tmpdir(), imageFileName);
-                        imageToBeUploaded = { filepath, mimetype };
+                        imageToBeUploaded = { filepath, mimeType };
                         file.pipe(fs.createWriteStream(filepath));
                     }
                 );
-                busboy.on('finish', () => {
+                bb.on('finish', () => {
                     admin
                         .storage()
                         .bucket(`${config.storageBucket}`)
@@ -242,7 +242,7 @@ exports.uploadGameCover = (req, res) => {
                             resumable: false,
                             metadata: {
                                 metadata: {
-                                    contentType: imageToBeUploaded.mimetype
+                                    contentType: imageToBeUploaded.mimeType
                                 }
                             }
                         })
@@ -263,7 +263,7 @@ exports.uploadGameCover = (req, res) => {
                             return res.status(500).json({ error: err.code });
                         });
                 });
-                busboy.end(req.rawBody);
+                bb.end(req.rawBody);
             }
         });
 };

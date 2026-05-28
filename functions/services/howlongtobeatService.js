@@ -1,9 +1,10 @@
 const levenshtein = require('fast-levenshtein');
 const hltb = require('howlongtobeat');
 const hltbService = new hltb.HowLongToBeatService();
+const logger = require('firebase-functions/logger');
 
 const axios = require('axios');
-const { hltbApi, apiKey } = require('../util/igdb');
+const { hltbApi, hltbApiKey } = require('../util/igdb');
 
 exports.searchGame = (gameName) => {
     return new Promise((resolve, reject) => {
@@ -12,11 +13,11 @@ exports.searchGame = (gameName) => {
         axios
             .get(urlWithQuery, {
                 headers: {
-                    "x-api-key": apiKey
+                    "x-api-key": hltbApiKey
                 }
             })
             .then(response => {
-                console.log(response.data);
+                logger.info(response.data);
                 const game = parseGameData(response.data, gameName)
                 resolve(game);
             })

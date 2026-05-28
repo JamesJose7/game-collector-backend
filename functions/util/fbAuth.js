@@ -1,4 +1,5 @@
 const { admin, db } = require('./admin');
+const logger = require('firebase-functions/logger');
 
 module.exports = (request, response, next) => {
     let idToken;
@@ -8,7 +9,7 @@ module.exports = (request, response, next) => {
     ) {
         idToken = request.headers.authorization.split('Bearer ')[1];
     } else {
-        console.error('No token found');
+        logger.error('No token found');
         return response.status(403).json({ error: 'Unauthorized' });
     }
 
@@ -28,7 +29,7 @@ module.exports = (request, response, next) => {
             return next();
         })
         .catch(err => {
-            console.error('Error while verifying token', err);
+            logger.error('Error while verifying token', err);
             return response.status(403).json(err);
         });
 };

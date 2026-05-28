@@ -1,4 +1,5 @@
 const { admin, db } = require('../util/admin');
+const logger = require('firebase-functions/logger');
 
 const config = require('../util/config');
 
@@ -18,7 +19,7 @@ exports.twitchAuth = (req, res) => {
             return res.json(response.data);
         })
         .catch((err) => {
-            console.error(err.message);
+            logger.error(err.message);
             res.status(500).json({ error: 'Something went wrong' });
         });
 };

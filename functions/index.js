@@ -1,7 +1,8 @@
-const functions = require('firebase-functions');
+const functions = require('firebase-functions/v1');
 const cors = require('cors')
 const app = require('express')();
 const FBAuth = require('./util/fbAuth');
+const logger = require('firebase-functions/logger');
 
 const { db } = require('./util/admin');
 
@@ -103,7 +104,7 @@ exports.createStatsOnNewUser = functions.firestore
                 console.info('Successfully added stats for user: ' + doc.user);
             })
             .catch((err) => {
-                console.error(err);
+                logger.error(err);
             });
     });
 
@@ -138,11 +139,11 @@ exports.createPlatformStatsOnNewPlatform = functions.firestore
                         .then(() =>
                             console.info('Platform stats created successfully')
                         )
-                        .catch((err) => console.error(err));
+                        .catch((err) => logger.error(err));
                 });
             })
             .catch((err) => {
-                console.error(err);
+                logger.error(err);
             });
     });
 
@@ -189,11 +190,11 @@ exports.updateStatsOnGameCreation = functions.firestore
                         .doc(doc.id)
                         .set(stats)
                         .then(() => console.info('Stats updated successfully'))
-                        .catch((err) => console.error(err));
+                        .catch((err) => logger.error(err));
                 });
             })
             .catch((err) => {
-                console.error(err);
+                logger.error(err);
             });
     });
 
@@ -257,11 +258,11 @@ exports.updateStatsOnGameUpdate = functions.firestore
                         .doc(doc.id)
                         .set(stats)
                         .then(() => console.info('Stats updated successfully'))
-                        .catch((err) => console.error(err));
+                        .catch((err) => logger.error(err));
                 });
             })
             .catch((err) => {
-                console.error(err);
+                logger.error(err);
             });
     });
 
@@ -306,10 +307,10 @@ exports.updateStatsOnGameDelete = functions.firestore
                         .doc(doc.id)
                         .set(stats)
                         .then(() => console.info('Stats updated successfully'))
-                        .catch((err) => console.error(err));
+                        .catch((err) => logger.error(err));
                 });
             })
             .catch((err) => {
-                console.error(err);
+                logger.error(err);
             });
     });

@@ -1,4 +1,5 @@
 const { db } = require('../util/admin');
+const logger = require('firebase-functions/logger');
 
 exports.getUserStats = (req, res) => {
     db.collection('stats')
@@ -15,7 +16,7 @@ exports.getUserStats = (req, res) => {
             });
         })
         .catch(err => {
-            console.error(err);
+            logger.error(err);
             res.status(500).json({ error: err.code })
         })
 }
